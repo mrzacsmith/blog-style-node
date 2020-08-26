@@ -1,5 +1,6 @@
 const path = require('path')
 const express = require('express')
+const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const morgan = require('morgan')
 const helmet = require('helmet')
@@ -8,7 +9,7 @@ const passport = require('passport')
 const session = require('express-session')
 const indexRouter = require('./routes/index.js')
 const authRouter = require('./routes/auth.js')
-
+const MongoStore = require('connect-mongo')(session)
 const connectDB = require('./config/db.js')
 
 // load config
@@ -31,12 +32,13 @@ if (process.env.NODE_ENV == 'development') {
 app.engine('.hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', '.hbs')
 
-// sessions middleware ~ before passport middleware
+// sessions middleware ~ before passport middleware //
 app.use(
   session({
     secret: 'lskjdf20384lskjf',
     resave: false,
     saveUninitialized: false,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 )
 
